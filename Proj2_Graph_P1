@@ -1,0 +1,23 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
+#read file for p1 into dataframe
+gaze1 = pd.read_csv('/Users/Paaamm16/Desktop/Archive/p1/p1.graphGZD.txt', sep='\t', names = ['Timestamp', 'Number', 'GazepointX_L', 'GazepointY_L', 'CamX_L', 'CamY_L', 'Distance_L', 'Pupil_L', 'Validity_L', 'GazepointX_R', 'GazepointY_R', 'CamX_R', 'CamY_R', 'Distance_R', 'Pupil_R', 'Validity_R'])
+
+#code pre-processing
+gaze1 = gaze1[(gaze1['Validity_L'] == 0) & (gaze1['Validity_R'] == 0)]
+gaze1['Pupil_Avg'] = (gaze1['Pupil_L'] + gaze1['Pupil_R']) / 2
+gaze1.drop(gaze1[gaze1['Pupil_Avg'] < 3].index, inplace = True) 
+gaze1.drop(gaze1[gaze1['Pupil_Avg'] > 6.5].index, inplace = True) 
+
+#convert ms to minutes
+gaze1['Minutes'] = gaze1['Timestamp'].apply(lambda x: x/60000)
+
+#plot values
+gaze1.plot(kind='line', x='Minutes', y='Pupil_Avg')
+
+#calculate the pupil averages
+gaze1['p1_Pupil_Avg'] = gaze1['Pupil_Avg'].mean(axis = 0)
+gaze1.head()
